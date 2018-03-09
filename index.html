@@ -38,9 +38,11 @@
 
         <script>
             var sourceData;
+			
+			var topVegies = {};
 
             // Initial data load
-            fetch("data.json", {
+            fetch("https://api.myjson.com/bins/fa68h", {
                 method: "GET",
                 headers: new Headers({
                     'Content-Type': 'application/json',
@@ -50,11 +52,94 @@
                 return body.json();
             }).then(function (data) {
                 sourceData = data;
-
+				
+				//Retrieve the top ten produce for each category
+				//Sort the produce into descending order with top produce at the top
+				topVegies = GetTopTen(data["Veg"]);
+				topVegies = SortArray(topVegies);
+				topMeat = GetTopTen(data["Meat"]);
+				topMeat = SortArray(topMeat);
+				topExtras = GetTopTen(data["Extras"]);
+				topExtras = SortArray(topExtras);
+				topRecipeBoxes = GetTopTen(data["Recipe boxes"]);
+				topRecipeBoxes = SortArray(topRecipeBoxes);
+				topVegBoxes = GetTopTen(data["Veg boxes"]);
+				topVegBoxes = SortArray(topVegBoxes);
+				
+				for (var key in topVegies)
+					console.log(key + ": " + topVegies[key]);
+				
                 // TODO: Build data visualisation
 
             });
-
+			
+			function GetTopTen(array)
+			{
+				var topTen = {};
+				
+				for (var key in array)
+				{
+					if (Object.keys(topTen).length < 10)
+						topTen[key] = array[key];
+					else
+					{
+						var lowestKey = FindLowestKey(topTen);
+						
+						if (array[key] > topTen[lowestKey])
+						{
+							delete topTen[lowestKey];
+							topTen[key] = array[key];
+						}
+					}
+				}
+				
+				return topTen;
+			};
+			
+			function FindLowestKey(array)
+			{
+				var lowestKey;
+				
+				for (var key in array)
+				{
+					if (lowestKey != null)
+					{
+						if (array[lowestKey] > array[key])
+							lowestKey = key;
+					}
+					else
+						lowestKey = key;
+				}
+				
+				return lowestKey;
+			};
+			
+			function SortArray(array)
+			{
+				var sortedArray = {};
+				
+				while (Object.keys(array).length > 0)
+				{
+					var largestKey = null;
+				
+					for (var key in array)
+					{
+						if (largestKey == null)
+							largestKey = key;
+						else
+						{
+							if (array[largestKey] < array[key])
+								largestKey = key;
+						}
+					}
+					
+					sortedArray[largestKey] = array[largestKey];
+					delete array[largestKey];
+				}
+				
+				return sortedArray;
+			};
+			
         </script>
     </body>
 </html>
