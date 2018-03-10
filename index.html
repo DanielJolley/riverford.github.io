@@ -33,14 +33,12 @@
     </head>
     <body>
         <h1>Riverford Data Analytics</h1>
-
-        <!-- TODO Add HTML containers for data visualisation -->
-
+		*The total sales of each categorized group of produce sold by Riverford Organic Farms
+		<br></br>
+        <canvas id="TotalsChart"></canvas>
+		<canvas id="ProduceChart"></canvas>
         <script>
-            var sourceData;
-			
-			var topVegies = {};
-
+		
             // Initial data load
             fetch("https://api.myjson.com/bins/fa68h", {
                 method: "GET",
@@ -51,26 +49,52 @@
             }).then(function (body) {
                 return body.json();
             }).then(function (data) {
-                sourceData = data;
 				
-				//Retrieve the top ten produce for each category
-				//Sort the produce into descending order with top produce at the top
-				topVegies = GetTopTen(data["Veg"]);
-				topVegies = SortArray(topVegies);
-				topMeat = GetTopTen(data["Meat"]);
-				topMeat = SortArray(topMeat);
-				topExtras = GetTopTen(data["Extras"]);
-				topExtras = SortArray(topExtras);
-				topRecipeBoxes = GetTopTen(data["Recipe boxes"]);
-				topRecipeBoxes = SortArray(topRecipeBoxes);
-				topVegBoxes = GetTopTen(data["Veg boxes"]);
-				topVegBoxes = SortArray(topVegBoxes);
+				var chartData = new Array();
+				var chartLabels = new Array();
+				var chartColours = new Array();
+				var chartBorderColours = new Array();
 				
-				for (var key in topVegies)
-					console.log(key + ": " + topVegies[key]);
+				for (var key in data)
+				{
+					chartData.push(GetTotalProduce(data[key]));
+					chartLabels.push(key);
+					
+					var redValue = Math.floor((Math.random() * 256));
+					var greenValue = Math.floor((Math.random() * 256));
+					var blueValue = Math.floor((Math.random() * 256));
+					
+					chartColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",0.6)");
+					chartBorderColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",1)");
+				}
 				
-                // TODO: Build data visualisation
-
+				var totalsChart = new Chart(document.getElementById("TotalsChart").getContext('2d'), 
+				{
+					type: 'bar',
+					data: 
+					{
+						labels: chartLabels,
+						datasets: 
+						[{
+							label: 'Riverford Produce Sales',
+							data: chartData,
+							backgroundColor: chartColours,
+							borderColor: chartBorderColours,
+							borderWidth: 1
+						}]
+					},
+					option:
+					{
+						animation:
+						{
+							duration: 1000,
+						},
+						legend:
+						{
+							display: false,
+						},
+					}
+				});
             });
 			
 			function GetTopTen(array)
@@ -138,6 +162,16 @@
 				}
 				
 				return sortedArray;
+			};
+			
+			function GetTotalProduce(array)
+			{
+				var total = 0;
+				
+				for (var key in array)
+					total += array[key];
+				
+				return total;
 			};
 			
         </script>
