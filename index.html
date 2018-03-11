@@ -29,17 +29,25 @@
                 -webkit-animation: chartjs-render-animation 0.001s;
                 animation: chartjs-render-animation 0.001s;
             }
+			
+			body
+			{
+				background-image: url("css/background.jpg");
+				background-size: cover;
+			}
         </style>
     </head>
     <body>
-        <h1><b>Riverford Data Analytics</b></h1>
-		*The total sales of each categorized group of produce sold by Riverford Organic Farms.
-		<br></br>
-        <canvas id="TotalsChart" height = "500" width = "800"></canvas>
-		<p> Display the top sold
-		<select id = "ProductList" onchange = "DisplayTopProducts()"></select> </p>
-
-		<canvas id="ProductChart" height = "500" width = "800"></canvas>
+        <h1><b><font size = 10>Riverford Data Analytics</font></b></h1>
+		<font size = 5>The following chart displays the total sales of products sold at Riverford Organic Farmers. The products have been grouped into categories of similar produce.<font><br>
+		<br>
+        <canvas id="TotalsChart" height = "500" width = "1000"></canvas> <br>
+		<br>
+		<font size = 5>The following chart displays the top products sold within the specified food groups. Select the group you wish to view for a more detailed analysis.</font><br>
+		<br>
+		<select id = "ProductList" text-align = "center" onchange = "DisplayTopProducts()"></select> <br>
+		<br>
+		<canvas id="ProductChart" height = "500" width = "1000"></canvas> <br>
         <script>
 			var sourceData;
 			var produceChart;
@@ -216,20 +224,21 @@
 						scaleShowValues: true,
 						responsive: false,
 						maintainAspectRatio: true,
+						legend: false,
 						scales: 
 						{
 							yAxes: 
 							[{
 								ticks: 
 								{
-									beginAtZero: true
+									beginAtZero: true,
 								}
 							}],
 							xAxes: 
 							[{
 								ticks: 
 								{
-									autoSkip: false
+									autoSkip: false,
 								}
 							}]
 						}
