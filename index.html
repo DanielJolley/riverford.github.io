@@ -32,13 +32,19 @@
         </style>
     </head>
     <body>
-        <h1>Riverford Data Analytics</h1>
-		*The total sales of each categorized group of produce sold by Riverford Organic Farms
+        <h1><b>Riverford Data Analytics</b></h1>
+		*The total sales of each categorized group of produce sold by Riverford Organic Farms.
 		<br></br>
-        <canvas id="TotalsChart"></canvas>
-		<canvas id="ProduceChart"></canvas>
+        <canvas id="TotalsChart" height = "500" width = "800"></canvas>
+		<p> Display the top sold
+		<select id = "ProductList" onchange = "DisplayTopProducts()"></select> </p>
+
+		<canvas id="ProductChart" height = "500" width = "800"></canvas>
         <script>
-		
+			var sourceData;
+			var produceChart;
+			var totalsChart;
+			
             // Initial data load
             fetch("https://api.myjson.com/bins/fa68h", {
                 method: "GET",
@@ -49,52 +55,23 @@
             }).then(function (body) {
                 return body.json();
             }).then(function (data) {
+				sourceData = data;
 				
+				var optionList = document.getElementById("ProductList");
 				var chartData = new Array();
 				var chartLabels = new Array();
-				var chartColours = new Array();
-				var chartBorderColours = new Array();
 				
 				for (var key in data)
 				{
 					chartData.push(GetTotalProduce(data[key]));
 					chartLabels.push(key);
-					
-					var redValue = Math.floor((Math.random() * 256));
-					var greenValue = Math.floor((Math.random() * 256));
-					var blueValue = Math.floor((Math.random() * 256));
-					
-					chartColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",0.6)");
-					chartBorderColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",1)");
+					optionList.innerHTML += "<option>" + key + "</option>";
 				}
 				
-				var totalsChart = new Chart(document.getElementById("TotalsChart").getContext('2d'), 
-				{
-					type: 'bar',
-					data: 
-					{
-						labels: chartLabels,
-						datasets: 
-						[{
-							label: 'Riverford Produce Sales',
-							data: chartData,
-							backgroundColor: chartColours,
-							borderColor: chartBorderColours,
-							borderWidth: 1
-						}]
-					},
-					option:
-					{
-						animation:
-						{
-							duration: 1000,
-						},
-						legend:
-						{
-							display: false,
-						},
-					}
-				});
+				if (totalsChart) totalsChart.destroy();
+				totalsChart = CreatePieChart('Product Sales', chartLabels, chartData, document.getElementById("TotalsChart"));
+				
+				DisplayTopProducts();
             });
 			
 			function GetTopTen(array)
@@ -172,6 +149,142 @@
 					total += array[key];
 				
 				return total;
+			};
+
+			function DisplayTopProducts()
+			{
+				var optionList = document.getElementById("ProductList");
+				var key = optionList.value;
+				var topProduce = SortArray(GetTopTen(sourceData[key]));
+								
+				var chartData = new Array();
+				var chartLabels = new Array();
+				
+				for (var product in topProduce)
+				{
+					chartData.push(topProduce[product]);
+					chartLabels.push(product);
+				}
+				
+				if (produceChart) produceChart.destroy();
+				produceChart = CreateBarChart(key, chartLabels, chartData, document.getElementById("ProductChart"));
+			}
+			
+			function CreateBarChart(caption, labels, values, element)
+			{
+				var chartColours = new Array();
+				var chartBorderColours = new Array();
+				
+				for (var key in values)
+				{
+					var redValue = Math.floor((Math.random() * 256));
+					var greenValue = Math.floor((Math.random() * 256));
+					var blueValue = Math.floor((Math.random() * 256));
+					
+					chartColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",0.6)");
+					chartBorderColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",1)");
+				}
+				
+				return new Chart(element.getContext('2d'), 
+				{
+					type: 'bar',
+					data: 
+					{
+						labels: labels,
+						datasets: 
+						[{
+							label: caption,
+							data: values,
+							backgroundColor: chartColours,
+							borderColor: chartBorderColours,
+							borderWidth: 1
+						}]
+					},
+					option:
+					{
+						animation:
+						{
+							duration: 1000,
+						},
+						legend:
+						{
+							display: false,
+						},
+					},
+					options: 
+					{
+						scaleShowValues: true,
+						responsive: false,
+						maintainAspectRatio: true,
+						scales: 
+						{
+							yAxes: 
+							[{
+								ticks: 
+								{
+									beginAtZero: true
+								}
+							}],
+							xAxes: 
+							[{
+								ticks: 
+								{
+									autoSkip: false
+								}
+							}]
+						}
+					}
+				});
+			};
+			
+			function CreatePieChart(caption, labels, values, element)
+			{
+				var chartColours = new Array();
+				var chartBorderColours = new Array();
+				
+				for (var key in values)
+				{
+					var redValue = Math.floor((Math.random() * 256));
+					var greenValue = Math.floor((Math.random() * 256));
+					var blueValue = Math.floor((Math.random() * 256));
+					
+					chartColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",0.6)");
+					chartBorderColours.push("rgba(" + redValue + "," + greenValue + "," + blueValue + ",1)");
+				}
+				
+				return new Chart(element.getContext('2d'), 
+				{
+					type: 'pie',
+					data: 
+					{
+						labels: labels,
+						datasets: 
+						[{
+							label: caption,
+							data: values,
+							backgroundColor: chartColours,
+							borderColor: chartBorderColours,
+							borderWidth: 1
+						}]
+					},
+					option:
+					{
+						animation:
+						{
+							duration: 1000,
+						},
+						legend:
+						{
+							display: false,
+						},
+					},
+					options: 
+					{
+						scaleShowValues: true,
+						responsive: false,
+						maintainAspectRatio: true,
+					}
+				});
 			};
 			
         </script>
